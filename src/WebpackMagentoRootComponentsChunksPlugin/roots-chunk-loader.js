@@ -65,7 +65,10 @@ module.exports = async function rootComponentsChunkLoader(/*ignored*/) {
                 );
             }
 
-            // TODO: Find a way to report this error "the webpack way"
+            // Because this error is reported from the loader, webpack CLI shows
+            // the error happening within `placeholder.ext`, which is some unfortunate
+            // indirection. TODO: Find a way to report the error for the correct module.
+            // Likely involves passing the error back to `WebpackMagentoPageChunksPlugin`
             if (!rootComponentDirectives.length) {
                 throw new Error(
                     `Failed to create chunk for the following file, because it is missing a @RootComponent directive: ${
@@ -90,6 +93,8 @@ const rootComponentMap = (module.exports.rootComponentMap = new WeakMap());
  * @returns {string}
  */
 function generateDynamicChunkEntry(dirs) {
+    // TODO: Dig deeper for an API to programatically create chunks, because
+    // generating strings of JS is far from ideal
     return dirs
         .map(dir => {
             const chunkName = dir.split(sep).slice(-1);

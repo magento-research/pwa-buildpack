@@ -1,12 +1,11 @@
-const path = require('path');
 const assert = require('assert');
-const { isAbsolute } = require('path');
+const { isAbsolute, join } = require('path');
 const { RawSource } = require('webpack-sources');
 const { rootComponentMap } = require('./roots-chunk-loader');
 const SingleEntryDependency = require('webpack/lib/dependencies/SingleEntryDependency');
 
-const loaderPath = path.join(__dirname, 'roots-chunk-loader.js');
-const placeholderPath = path.join(__dirname, 'placeholder.ext');
+const loaderPath = join(__dirname, 'roots-chunk-loader.js');
+const placeholderPath = join(__dirname, 'placeholder.ext');
 const ENTRY_NAME = '__magento_page_roots__';
 
 class WebpackMagentoRootComponentsChunksPlugin {
@@ -22,7 +21,7 @@ class WebpackMagentoRootComponentsChunksPlugin {
         const { rootComponentsDirs } = this;
 
         const rootComponentsDirsAbs = rootComponentsDirs.map(
-            dir => (isAbsolute(dir) ? dir : path.join(context, dir))
+            dir => (isAbsolute(dir) ? dir : join(context, dir))
         );
 
         // This is a trick to force webpack into reading a dynamic file from memory,
@@ -53,9 +52,9 @@ class WebpackMagentoRootComponentsChunksPlugin {
             // Prepare the manifest that the Magento backend can use
             // to pick root components for a page.
             const manifest = trickEntryPoint.chunks.reduce((acc, chunk) => {
-                const chunkModule = [...chunk._modules][0];
+                const [chunkModule] = chunk._modules;
                 const rootDirective = rootComponentMap.get(chunkModule);
-                const rootComponentFilename = chunk.files[0]; // No idea why `files` is an array here 🤔
+                const [rootComponentFilename] = chunk.files; // No idea why `files` is an array here 🤔
 
                 acc[chunk.name] = rootDirective;
                 return acc;
