@@ -34,7 +34,7 @@ module.exports = async function rootComponentsChunkLoader(/*ignored*/) {
         const sources = await Promise.all(
             dirs.map(async dir => {
                 const rootComponentPath = join(dir, 'index.js'); // index.js should probably be configurable
-                const [src, _, mod] = await pifyMultipleArgs(
+                const [src, , mod] = await pifyMultipleArgs(
                     this.loadModule.bind(this)
                 )(rootComponentPath);
 

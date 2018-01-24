@@ -195,13 +195,14 @@ test('Works when there is 1 unnamed entry point in the config', async () => {
     expect(writtenFiles).toEqual(expectedFiles);
 });
 
-test('Includes RootComponent description and pageTypes in the manifest', async () => {
+test('Includes RootComponent description, pageTypes, and chunk filename in the manifest', async () => {
     const config = {
         context: basic1PageProjectDir,
         entry: join(basic1PageProjectDir, 'entry.js'),
         output: {
             path: join(basic1PageProjectDir, 'dist'),
-            filename: '[name].js'
+            filename: '[name].js',
+            chunkFilename: '[name].chunk.js'
         },
         plugins: [
             new MagentoPageChunksPlugin({
@@ -222,6 +223,7 @@ test('Includes RootComponent description and pageTypes in the manifest', async (
     );
     expect(manifest.SomePage.pageTypes).toEqual(['cms_page']);
     expect(manifest.SomePage.description).toEqual('CMS Page Root Component');
+    expect(manifest.SomePage.chunkName).toBe('SomePage.chunk.js');
 });
 
 test('Logs warning when RootComponent file has > 1 @RootComponent comment', async () => {

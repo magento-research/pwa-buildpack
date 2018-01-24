@@ -56,7 +56,10 @@ class WebpackMagentoRootComponentsChunksPlugin {
                 const rootDirective = rootComponentMap.get(chunkModule);
                 const [rootComponentFilename] = chunk.files; // No idea why `files` is an array here 🤔
 
-                acc[chunk.name] = rootDirective;
+                acc[chunk.name] = Object.assign(
+                    { chunkName: rootComponentFilename },
+                    rootDirective
+                );
                 return acc;
             }, {});
 
