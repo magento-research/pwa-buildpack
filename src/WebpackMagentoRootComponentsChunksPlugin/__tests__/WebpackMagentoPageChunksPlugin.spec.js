@@ -275,3 +275,30 @@ test('Build fails when no @RootComponent directive is found', async () => {
         /Failed to create chunk for the following file, because it is missing a @RootComponent directive/
     );
 });
+
+test('Should not spit out sourcemaps for the removed "trick" entry point when external sourcemaps are enabled', async () => {
+    const config = {
+        context: basic1PageProjectDir,
+        devtool: 'source-map',
+        entry: join(basic1PageProjectDir, 'entry.js'),
+        output: {
+            path: join(basic1PageProjectDir, 'dist'),
+            filename: '[name].js',
+            chunkFilename: '[name].chunk.js'
+        },
+        plugins: [
+            new MagentoPageChunksPlugin({
+                rootComponentsDirs: [
+                    join(basic1PageProjectDir, 'RootComponents')
+                ],
+                manifestFileName: 'manifest.json'
+            })
+        ]
+    };
+
+    const { fs } = await compile(config);
+    const writtenFiles = fs.readdirSync(config.output.path).sort();
+    expect(writtenFiles).not.toContain(
+        `${MagentoPageChunksPlugin.ENTRY_NAME}.js.map`
+    );
+});
