@@ -98,6 +98,11 @@ module.exports = async function rootComponentsChunkLoader(src) {
 const rootComponentMap = (module.exports.rootComponentMap = new Map());
 
 /**
+ * @description webpack does not provide a programmatic API to create chunks for
+ * n files. To get around this, we inject an (unused) function declaration in the entry point,
+ * that wraps n number of import() calls. This will force webpack to create the chunks we need
+ * for each RootComponent, but will allow UglifyJS to remove the wrapper function
+ * (and the dynamic import calls) from the final bundle.
  * @param {string[]} dirs
  * @returns {string}
  */
@@ -120,7 +125,7 @@ function generateDynamicImportCode(dirs) {
     // Note: the __PURE__ comment ensures UglifyJS won't include
     // the unnecessary function in the output
     return `
-        /*#__PURE__*/function doNotInvoke() {
+        /*#__PURE__*/function this_function_will_be_removed_by_uglify() {
             ${dynamicImportsStr}
         }
     `;
