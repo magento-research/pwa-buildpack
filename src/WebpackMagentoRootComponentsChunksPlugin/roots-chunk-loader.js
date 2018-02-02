@@ -69,7 +69,7 @@ module.exports = async function rootComponentsChunkLoader(src) {
             }
 
             // Because this error is reported from the loader for an entry point, webpack CLI shows
-            // the error happening within an entry point for the project, rather than the file missing
+            // the error happening within an entry point for the project, rather than the file
             // that is missing a directive. TODO: Find a way to report the error for the correct module.
             // Likely involves passing the error back to `WebpackMagentoPageChunksPlugin`
             if (!rootComponentDirectives.length) {

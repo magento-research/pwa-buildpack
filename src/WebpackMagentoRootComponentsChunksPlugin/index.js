@@ -102,7 +102,6 @@ class WebpackMagentoRootComponentsChunksPlugin {
             compilation.assets[this.manifestFileName] = new RawSource(
                 JSON.stringify(manifest, null, 4)
             );
-            moduleByPath.clear();
             cb();
         });
     }
