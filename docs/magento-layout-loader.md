@@ -4,10 +4,10 @@ _This is a very early implementation, and the API should be considered
 unstable._
 
 The `magento-layout-loader` is a [webpack
-loader](https://webpack.js.org/concepts/loaders/) that implements the Magento
-PWA Studio layout language. It gives Magento modules/extensions the ability to
-inject or remove content blocks in a layout without modifying theme source
-files.
+loader](https://webpack.js.org/concepts/loaders/) that transforms
+[JSX](https://reactjs.org/docs/introducing-jsx.html) during compilation. It
+gives Magento modules/extensions the ability to inject or remove content blocks
+in a layout without modifying theme source files.
 
 ## Terminology
 
