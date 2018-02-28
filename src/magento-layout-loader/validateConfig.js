@@ -11,7 +11,7 @@ const ajv = new Ajv();
  * @returns {{ passed: bool, error: string | null }}
  */
 module.exports = config => {
-    for (const [, rules] of Object.entries(config)) {
+    for (const rules of Object.values(config)) {
         for (const rule of rules) {
             const validator = validatorsByOperation[rule.operation];
             validator(rule);
