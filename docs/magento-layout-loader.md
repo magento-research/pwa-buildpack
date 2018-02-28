@@ -263,4 +263,26 @@ function render() {
 
 ## FAQ
 
-TODO: Commonly asked questions
+### How are the configurations for individual extensions/modules collected and provided to the loader?
+
+This functionality has not been completed yet. There is outstanding work to be
+done in Magento 2 to collect and expose aggregated configuration from each
+module.
+
+### Why is a `Container` required to be a DOM Element?
+
+There are many tools in the React ecosystem that attempt to prevent passing
+unknown props to React components (`TypeScript`/`Flow`/`eslint`/etc). However,
+`data-*` props are always allowed on DOM elements. By enforcing this
+restriction, we can [prevent surprising
+behavior](https://en.wikipedia.org/wiki/Principle_of_least_astonishment) when
+copying and pasting code from examples into a theme or module/extension.
+Compiling out these extra props would not mitigate the issue, as all the
+aforementioned tools operate on source files.
+
+### Why is a `ContainerChild` the only type of child allowed within a `Container`?
+
+This restriction is necessary to support the [`insertBefore`](#insertbefore) and
+[`insertAfter`](#insertafter) operations. Because a `ContainerChild` is required
+to have a unique `id` prop, this ensures that there will never be an
+untargetable child of a `Container`.
