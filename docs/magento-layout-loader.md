@@ -34,8 +34,8 @@ restrictions with Containers to be aware of:
 
 ## `ContainerChild` Details
 
-Import the ContainerChild from @magento/peregrine to use it in your
-extension/module:
+Import the `ContainerChild` component from `@magento/peregrine` to use it in
+your extension/module:
 
 ```js
 import { ContainerChild } from '@magento/peregrine';
@@ -60,6 +60,8 @@ documentation for further details on usage.
 
 #### removeContainer
 
+##### Configuration
+
 ```js
 {
     "operation": "removeContainer",
@@ -67,7 +69,39 @@ documentation for further details on usage.
 }
 ```
 
+<details>
+<summary>Example</summary>
+
+##### Input
+
+```js
+import React from 'react';
+
+function render() {
+    return (
+        <div className="wrapper">
+            The div below will be removed
+            <div data-mid="any.container.id" />
+        </div>
+    );
+}
+```
+
+##### Output
+
+```js
+import React from 'react';
+
+function render() {
+    return <div className="wrapper">The div below will be removed</div>;
+}
+```
+
+</details>
+
 #### removeChild
+
+##### Configuration
 
 ```js
 {
@@ -77,7 +111,47 @@ documentation for further details on usage.
 }
 ```
 
+<details>
+<summary>Example</summary>
+
+##### Input
+
+```js
+import React from 'react';
+import { ContainerChild } from '@magento/peregrine';
+
+function render() {
+    return (
+        <div className="wrapper" data-mid="any.container.id">
+            The container below will be removed
+            <ContainerChild
+                id="container.child.id"
+                render={() => <div>This content will be removed</div>}
+            />
+        </div>
+    );
+}
+```
+
+##### Output
+
+```js
+import React from 'react';
+
+function render() {
+    return (
+        <div className="wrapper" data-mid="any.container.id">
+            The container below will be removed
+        </div>
+    );
+}
+```
+
+</details>
+
 #### insertBefore
+
+##### Configuration
 
 ```js
 {
@@ -88,7 +162,52 @@ documentation for further details on usage.
 }
 ```
 
+<details>
+<summary>Example</summary>
+
+##### Input
+
+```js
+import React from 'react';
+import { ContainerChild } from '@magento/peregrine';
+
+function render() {
+    return (
+        <div className="wrapper" data-mid="any.container.id">
+            <ContainerChild
+                id="container.child.id"
+                render={() => <div>Some Content</div>}
+            />
+        </div>
+    );
+}
+```
+
+##### Output
+
+```js
+import React from 'react';
+import { ContainerChild } from '@magento/peregrine';
+import _Extension from '/Absolute/path/to/a/component.js';
+
+function render() {
+    return (
+        <div className="wrapper" data-mid="any.container.id">
+            <_Extension />
+            <ContainerChild
+                id="container.child.id"
+                render={() => <div>Some Content</div>}
+            />
+        </div>
+    );
+}
+```
+
+</details>
+
 #### insertAfter
+
+##### Configuration
 
 ```js
 {
@@ -98,6 +217,49 @@ documentation for further details on usage.
     "componentPath": "/Absolute/path/to/a/component.js"
 }
 ```
+
+<details>
+<summary>Example</summary>
+
+##### Input
+
+```js
+import React from 'react';
+import { ContainerChild } from '@magento/peregrine';
+
+function render() {
+    return (
+        <div className="wrapper" data-mid="any.container.id">
+            <ContainerChild
+                id="container.child.id"
+                render={() => <div>Some Content</div>}
+            />
+        </div>
+    );
+}
+```
+
+##### Output
+
+```js
+import React from 'react';
+import { ContainerChild } from '@magento/peregrine';
+import _Extension from '/Absolute/path/to/a/component.js';
+
+function render() {
+    return (
+        <div className="wrapper" data-mid="any.container.id">
+            <ContainerChild
+                id="container.child.id"
+                render={() => <div>Some Content</div>}
+            />
+            <_Extension />
+        </div>
+    );
+}
+```
+
+</details>
 
 ## FAQ
 
