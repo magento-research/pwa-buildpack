@@ -79,9 +79,7 @@ function babelPluginMageExtensionsFactory(options = {}) {
                     const targetPropWrapper = targetPropAttr.value;
                     assert(
                         t.isStringLiteral(targetPropWrapper),
-                        `${
-                            targetProp
-                        } prop must be a literal string value. Instead it was of type ${
+                        `${targetProp} prop must be a literal string value. Instead it was of type ${
                             targetPropWrapper.type
                         }`
                     );
