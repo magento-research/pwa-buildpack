@@ -20,4 +20,5 @@ a Peregrine app to a Magento backend and a
   Divides static assets into bundled "chunks" based on components registered
   with the Magento PWA `RootComponent` interface
 * [`PWADevServer`](docs/PWADevServer.md) -- Configures your system settings and
-  Webpack configuration for secure, PWA-enabled local development
+* [`ServiceWorkerPlugin`](docs/ServiceWorkerPlugin.md) -- Creates
+  a ServiceWorker with different settings based on dev scenarios
