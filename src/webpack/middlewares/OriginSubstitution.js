@@ -47,5 +47,5 @@ module.exports = function createOriginSubstitutionMiddleware(
         ...tagsToReplaceOrigin,
         ...attributesToReplaceOrigin
     ];
-    return harmon([], allTransforms);
+    return harmon([], allTransforms, true);
 };
