@@ -13,8 +13,8 @@ const middlewares = {
 const { lookup } = require('../util/promisified/dns');
 const { find: findPort } = require('../util/promisified/openport');
 const runAsRoot = require('../util/run-as-root');
-class DevServer {
-    static validateConfig = optionsValidator('DevServer', {
+class PWADevServer {
+    static validateConfig = optionsValidator('PWADevServer', {
         id: 'string',
         publicPath: 'string',
         backendDomain: 'string',
@@ -60,7 +60,7 @@ class DevServer {
         }
     }
     static async findFreePort() {
-        const inUse = await this.portsByHostname.values(Number);
+        const inUse = await PWADevServer.portsByHostname.values(Number);
         debug(`findFreePort(): these ports already in use`, inUse);
         return findPort({
             startingPort: 8000,
@@ -78,7 +78,7 @@ class DevServer {
         const maybeHostname =
             identifier + (times ? times : '') + '.local.pwadev';
         // if it has a port, it exists
-        const exists = await this.portsByHostname.get(maybeHostname);
+        const exists = await PWADevServer.portsByHostname.get(maybeHostname);
         if (!exists) {
             debug(
                 `findFreeHostname: ${maybeHostname} unbound to port and available`
@@ -86,23 +86,23 @@ class DevServer {
             return maybeHostname;
         } else {
             debug(`findFreeHostname: ${maybeHostname} bound to port`, exists);
-            return this.findFreeHostname(identifier, times + 1);
+            return PWADevServer.findFreeHostname(identifier, times + 1);
         }
     }
     static async provideDevHost(id) {
         debug(`provideDevHost('${id}')`);
-        let hostname = await this.hostnamesById.get(id);
+        let hostname = await PWADevServer.hostnamesById.get(id);
         let port;
         if (!hostname) {
             [hostname, port] = await Promise.all([
-                this.findFreeHostname(id),
-                this.findFreePort()
+                PWADevServer.findFreeHostname(id),
+                PWADevServer.findFreePort()
             ]);
 
-            await this.hostnamesById.set(id, hostname);
-            await this.portsByHostname.set(hostname, port);
+            await PWADevServer.hostnamesById.set(id, hostname);
+            await PWADevServer.portsByHostname.set(hostname, port);
         } else {
-            port = await this.portsByHostname.get(hostname);
+            port = await PWADevServer.portsByHostname.get(hostname);
             if (!port) {
                 throw Error(
                     debug.errorMsg(
@@ -111,7 +111,7 @@ class DevServer {
                 );
             }
         }
-        this.setLoopback(hostname);
+        PWADevServer.setLoopback(hostname);
         return {
             protocol: 'https:',
             hostname,
@@ -120,8 +120,12 @@ class DevServer {
     }
     static async configure(config = {}) {
         debug('configure() invoked', config);
-        this.validateConfig('.configure(config)', config);
-        const devHost = await this.provideDevHost(config.id);
+        PWADevServer.validateConfig('.configure(config)', config);
+        const sanitizedId = config.id
+            .toLowerCase()
+            .replace(/[^a-zA-Z0-9]/g, '-')
+            .replace(/^-+/, '');
+        const devHost = await PWADevServer.provideDevHost(sanitizedId);
         const https = await SSLCertStore.provide(devHost.hostname);
         debug(`https provided:`, https);
         return {
@@ -160,4 +164,4 @@ class DevServer {
         };
     }
 }
-module.exports = DevServer;
+module.exports = PWADevServer;
