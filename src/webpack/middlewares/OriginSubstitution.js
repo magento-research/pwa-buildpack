@@ -21,8 +21,8 @@ module.exports = function createOriginSubstitutionMiddleware(
             );
         }
     }));
-    const tagsToReplaceOrigin = ['style'].map(attr => ({
-        query: attr,
+    const tagsToReplaceOrigin = ['style'].map(query => ({
+        query,
         func(node) {
             const stream = node.createStream();
             stream

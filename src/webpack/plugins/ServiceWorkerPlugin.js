@@ -2,6 +2,7 @@
 const WorkboxPlugin = require('workbox-webpack-plugin');
 const WriteFileWebpackPlugin = require('write-file-webpack-plugin');
 const optionsValidator = require('../../util/options-validator');
+const Environment = require('../../BuildSession/Environment');
 
 class ServiceWorkerPlugin {
     static validateOptions = optionsValidator('ServiceWorkerPlugin', {
@@ -38,7 +39,7 @@ class ServiceWorkerPlugin {
         }).apply(compiler);
     }
     apply(compiler) {
-        if (this.config.env.mode === 'development') {
+        if (this.config.env.mode === Environment.Mode.DEVELOPMENT) {
             // add a WriteFilePlugin to write out the service worker to the filesystem so it can be served by M2, even though it's under dev
             if (this.config.enableServiceWorkerDebugging) {
                 new WriteFileWebpackPlugin({

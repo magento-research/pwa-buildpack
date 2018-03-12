@@ -1,0 +1,29 @@
+{
+    "globalStatusOutput": "\nid       name               provider   state    directory                               \n----------------------------------------------------------------------------------------\nc9b8add  magento2.vagrant89 virtualbox aborted  /Users/somebody/pwa/vagrant-magento \n0ce65ca  magento2.vagrant96 virtualbox poweroff /Users/somebody/vagrant-magento     \n78ddaea  magento2.vagrant96 virtualbox poweroff /Users/somebody/vagrant-magento2.0     \n \nThe above shows information about all known Vagrant environments\non this machine. This data is cached and may not be completely\nup-to-date. To interact with any of the machines, you can go to\nthat directory and run Vagrant, or you can use the ID directly\nwith Vagrant commands from any directory. For example:\n\"vagrant destroy 1a2b3c4d\"\n",
+    "bustedColumns": "\nid       name               provider   state    directory                               \n----------------------------------------------------------------------------------------\nc9b8add  magento2.vagrant89 virtualbox aborted  /Users/somebody/pwa/vagrant-magento \n0ce65ca  magento2.vagrant96 virtualbox poweroff /Users/somebody/vagrant-magento   woah  \n78ddaea  magento2.vagrant96 virtualbox poweroff /Users/somebody/vagrant-magento2.0     \n \nThe above shows information about all known Vagrant environments\non this machine. This data is cached and may not be completely\nup-to-date. To interact with any of the machines, you can go to\nthat directory and run Vagrant, or you can use the ID directly\nwith Vagrant commands from any directory. For example:\n\"vagrant destroy 1a2b3c4d\"\n",
+    "parsedMachines": [
+        {
+            "id": "c9b8add",
+            "name": "magento2.vagrant89",
+            "provider": "virtualbox",
+            "state": "aborted",
+            "directory": "/Users/somebody/pwa/vagrant-magento"
+        },
+        {
+            "id": "0ce65ca",
+            "name": "magento2.vagrant96",
+            "provider": "virtualbox",
+            "state": "poweroff",
+            "directory": "/Users/somebody/vagrant-magento"
+        },
+        {
+            "id": "78ddaea",
+            "name": "magento2.vagrant96",
+            "provider": "virtualbox",
+            "state": "poweroff",
+            "directory": "/Users/somebody/vagrant-magento2.0"
+        }
+    ],
+    "nonUniqueName": "magento2.vagrant96"
+
+}

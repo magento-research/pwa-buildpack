@@ -1,0 +1,25 @@
+{
+    "dependencies": {
+      "@magento/peregrine": {
+        "version": "0.1.1-alpha"
+      },
+      "babel-runtime": {
+        "version": "6.26.0"
+      },
+      "react": {
+        "version": "16.2.0"
+      },
+      "react-dom": {
+        "version": "16.2.0"
+      },
+      "react-redux": {
+        "version": "5.0.6"
+      },
+      "react-router-dom": {
+        "version": "4.2.3"
+      },
+      "redux": {
+        "version": "3.7.2"
+      }
+    }
+  }

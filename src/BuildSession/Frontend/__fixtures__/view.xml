@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<view xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Config/etc/view.xsd">
+  <vars module="Magento_Bundle">
+    <var name="product_summary_image_size">58</var>
+  </vars>
+  <vars module="Js_Bundle">
+    <var name="bundle_size">1MB</var>
+  </vars>
+  <vars module="Magento_Pwa">
+    <var name="serviceworker_name">sw.js</var>
+    <var name="devserver_host">https://magento-venia.local.pwadev/</var>
+    <var name="devserver_port">8000</var>
+  </vars>
+</view>

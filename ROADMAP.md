@@ -1,0 +1,8 @@
+ - Provisioners autodetect settings where possible (httpd.conf etc)
+ - Better handling of service worker in dev mode (pass env via postMessage and adjust behavior)
+ - Better recognition of backend failure states (ECONNREFUSED etc)
+ - Centralized config
+ - TS definition files
+ - Provisioner for Docker
+ - Big refactor: Switch from Promises to Observables so that backend updates can push to dev environment
+ - Browser interface option

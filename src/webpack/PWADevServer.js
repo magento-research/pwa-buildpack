@@ -10,8 +10,10 @@ const middlewares = {
     devProxy: require('./middlewares/DevProxy'),
     staticRootRoute: require('./middlewares/StaticRootRoute')
 };
-const { lookup } = require('../util/promisified/dns');
-const { find: findPort } = require('../util/promisified/openport');
+const {
+    dns: { lookup },
+    openport: { find: findPort }
+} = require('../util/promisified');
 const runAsRoot = require('../util/run-as-root');
 class PWADevServer {
     static validateConfig = optionsValidator('PWADevServer', {
