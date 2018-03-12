@@ -1,6 +1,6 @@
 module.exports = {
     MagentoRootComponentsPlugin: require('./plugins/MagentoRootComponentsPlugin'),
     ServiceWorkerPlugin: require('./plugins/ServiceWorkerPlugin'),
-    Resolver: require('./Resolver'),
+    MagentoResolver: require('./MagentoResolver'),
     PWADevServer: require('./PWADevServer')
 };

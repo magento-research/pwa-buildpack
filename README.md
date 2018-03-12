@@ -22,3 +22,5 @@ a Peregrine app to a Magento backend and a
 * [`PWADevServer`](docs/PWADevServer.md) -- Configures your system settings and
 * [`ServiceWorkerPlugin`](docs/ServiceWorkerPlugin.md) -- Creates
   a ServiceWorker with different settings based on dev scenarios
+* [`MagentoResolver`](docs/MagentoResolver.md) -- Configures Webpack to resolve
+  modules and assets in Magento PWA themes.
