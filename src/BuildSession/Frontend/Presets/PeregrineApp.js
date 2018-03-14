@@ -1,9 +1,7 @@
 const { resolve } = require('path');
-const {
-    child_process: { exec },
-    fs,
-    xml2js
-} = require('../../../util/promisified');
+const { exec } = require('../../../util/promisified/child_process');
+const fs = require('../../../util/promisified/fs');
+const xml2js = require('../../../util/promisified/xml2js');
 const semver = require('semver');
 const debug = require('../../../util/debug').here(__filename);
 const { Mode } = require('../../Environment');
