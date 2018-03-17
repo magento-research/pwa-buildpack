@@ -44,6 +44,7 @@
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.1",
+    "babel-loader": "^7.1.3",
     "babel-plugin-syntax-jsx": "^6.18.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-react-jsx": "^6.24.1",
@@ -67,8 +68,10 @@
   "dependencies": {
     "@magento/devcert": "^0.5.0",
     "@magento/directive-parser": "^0.1.1",
+    "ajv": "^6.1.1",
     "apacheconf": "0.0.5",
     "debug": "^3.1.0",
+    "babel-helper-module-imports": "^7.0.0-beta.3",
     "express": "^4.16.2",
     "faded-progressbar": "^0.9.3",
     "flat-file-db": "^1.0.0",
@@ -76,6 +79,7 @@
     "hostile": "^1.3.1",
     "http-proxy-middleware": "^0.17.4",
     "lodash.get": "^4.4.2",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "make-fetch-happen": "^2.6.0",
     "mkdirp": "^0.5.1",
     "openport": "0.0.4",
@@ -88,6 +92,10 @@
     "workbox-webpack-plugin": "^3.0.0-beta.1",
     "write-file-webpack-plugin": "^4.2.0",
     "xml2js": "^0.4.19"
+  },
+  "peerDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7"
   },
   "jest": {
     "clearMocks": true,

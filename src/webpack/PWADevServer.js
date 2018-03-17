@@ -113,7 +113,7 @@ class PWADevServer {
                 );
             }
         }
-        PWADevServer.setLoopback(hostname);
+        await PWADevServer.setLoopback(hostname);
         return {
             protocol: 'https:',
             hostname,

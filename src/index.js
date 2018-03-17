@@ -1,7 +1,7 @@
-const babelPluginMagentoLayout = require('./babel-plugin-magento-layout');
+const magentoLayoutLoader = require('./magento-layout-loader');
 
 module.exports = {
-    babelPluginMagentoLayout,
+    magentoLayoutLoader,
     Webpack: require('./webpack'),
     BuildSession: require('./BuildSession')
 };
