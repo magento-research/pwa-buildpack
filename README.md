@@ -39,7 +39,7 @@ in it:
 
   MAGENTO_BACKEND_PUBLIC_PATH=/pub/static/frontend/<Vendor>/<theme>/en_US
   # change the above to your vendor and theme name
-  # the locale must be `en_US` for now (sorry!)
+  # the locale must be `en_US` for now
 
   SERVICE_WORKER_FILE_NAME="sw.js"
   ```
@@ -76,9 +76,9 @@ in it:
     +
     +};
     ```
+    This function will execute when Webpack runs and requests configuration.
 
-0. This function will execute when Webpack runs and requests configuration. Add
-   a line to create a Buildpack `Environment`:
+0. Add these lines to create a Buildpack `Environment`:
     ```diff
     module.exports = async function(cliEnvironment) {
 
@@ -90,7 +90,64 @@ in it:
     All aspects of the `BuildSession` will use this `Environment` to share
     configuration settings, most importantly development/production switches.
 
-0. Configure a development
+    Webpack passes command-line `--env` flags as an argument to the configuration function, so you can use `cliEnvironment` as a starting point or an override.
+
+0. Configure the BuildSession for development mode using an `if` statement.
+    ```diff
+    module.exports = async function(cliEnvironment) {
+
+        const { Environment } = BuildSession;
+        const env = Environment.create(cliEnvironment.mode);
+    +
+    +   if (env.mode === Enrivonment.Mode.DEVELOPMENT) {
+    +
+    +   }
+
+    };
+    ```
+
+0. When in development mode, you'll use a **Frontend Provisioner** designed for development mode. Add these lines inside the `if` block:
+    ```diff
+    if (env.mode === Environment.Mode.DEVELOPMENT) {
+
+    +    const frontend = await Frontend.develop(
+    +        Frontend.presets.PeregrineApp,
+    +        env,
+    +        {
+    +            baseDir: __dirname,
+    +            backendDomain: process.env.MAGENTO_BACKEND_DOMAIN
+    +        }
+    +    );
+    +
+    }
+    ```
+
+    This creates a Provisioner object called `frontend` that will help to configure your development environment to work on a Peregrine app. This provisioner takes many options, but the two required options are `baseDir` (the root directory of the theme) and `backendDomain` (the network host where the local Magento store is located.)
+
+0. When in development mode, you'll use a **Backend Provisioner** designed to provide the server-side functionality necessary to do smooth, fast theme and UI development. Add these lines inside the `if` block:
+    ```diff
+    if (env.mode === Environment.Mode.DEVELOPMENT) {
+
+        const frontend = await Frontend.develop(
+            Frontend.presets.PeregrineApp,
+            env,
+            {
+                baseDir: __dirname,
+                backendDomain: process.env.MAGENTO_BACKEND_DOMAIN
+            }
+        );
+
+    +    const backend = await Backend.develop(
+    +        Backend.presets.OSXLocalHosted,
+    +        env,
+    +        {
+    +            vmName: backendDomain.hostname,
+    +            baseDir: process.env.MAGENTO_PATH,
+    +            backendDomain
+    +        }
+    +    );
+    }
+    ```
 
 In any project managed by NPM, the standard command to run the project is `npm
 start`. A Magento PWA theme is no different! Start the development cycle with
