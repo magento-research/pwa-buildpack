@@ -14,7 +14,9 @@ const mockHash = {
 };
 
 const mockDb = {
-    on: jest.fn((_, callback) => setImmediate(callback)),
+    on: jest.fn((type, callback) => {
+        if (type === 'open') setImmediate(callback);
+    }),
     get: jest.fn(),
     put: jest.fn((k, v, cb) => setImmediate(cb)),
     del: jest.fn((k, cb) => setImmediate(cb)),
@@ -46,6 +48,17 @@ test('static async db() returns a Promise for a db', async () => {
     expect(fakeDb).toBe(mockDb);
 });
 
+test('static async db() rejects if db open failed', async () => {
+    mockDb.on.mockImplementationOnce((type, callback) => {
+        if (type === 'error') {
+            callback(new Error('Open failed'));
+        } else if (type === 'open') {
+            setImmediate(callback);
+        }
+    });
+    await expect(GlobalConfig.db()).rejects.toThrow('Open failed');
+});
+
 test('static async db() memoizes db and only creates it once', async () => {
     const fakeDb = await GlobalConfig.db();
     const fakeDbAgain = await GlobalConfig.db();
@@ -63,12 +76,15 @@ test('static async db() rejects with underlying error if db create failed', asyn
 test('GlobalConfig constructor throws if no conf or missing required conf', () => {
     expect(() => new GlobalConfig()).toThrow();
     expect(() => new GlobalConfig({ prefix: 'foo' })).toThrow();
-    expect(() => new GlobalConfig({ key: () => {} })).toThrow();
+    expect(() => new GlobalConfig({ key: x => x })).toThrow();
     expect(
         () => new GlobalConfig({ key: 'bad key', prefix: 'good prefix' })
     ).toThrow();
     expect(
         () => new GlobalConfig({ key: () => {}, prefix: 'good prefix' })
+    ).toThrow();
+    expect(
+        () => new GlobalConfig({ key: x => x, prefix: 'good prefix' })
     ).not.toThrow();
 });
 
@@ -84,15 +100,6 @@ test('.get() calls underlying flatfile', async () => {
     expect(mockHash.update).toHaveBeenCalledWith('value');
     expect(mockHash.digest).toHaveBeenCalled();
     expect(mockDb.get).toHaveBeenCalledWith('test1fakeDigest');
-});
-
-test('.get() works with null key, creating single-value store', async () => {
-    const cfg = new GlobalConfig({ prefix: 'test1', key: () => {} });
-    await cfg.get();
-    expect(crypto.createHash).not.toHaveBeenCalled();
-    expect(mockHash.update).not.toHaveBeenCalled();
-    expect(mockHash.digest).not.toHaveBeenCalled();
-    expect(mockDb.get).toHaveBeenCalledWith('test1');
 });
 
 test('.get() dies if key function returns non-string', async () => {

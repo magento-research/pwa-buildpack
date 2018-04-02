@@ -1,20 +1,22 @@
 const GlobalConfig = require('./global-config');
-const debug = require('./debug').here(__filename);
+const debug = require('./debug').makeFileLogger(__filename);
 const { exec } = require('./promisified/child_process');
 const runAsRoot = require('./run-as-root');
 
-module.exports = class SSLCertStore {
-    static userCerts = new GlobalConfig({
-        prefix: 'devcert',
-        key: x => x
-    });
+const userCerts = new GlobalConfig({
+    prefix: 'devcert',
+    key: x => x
+});
+
+module.exports = {
+    userCerts,
     // treat a certificate as basically expired if it'll expire in 1 day (86400s)
-    static async expired(cert) {
+    async expired(cert) {
         return exec(`openssl x509 -checkend 0 <<< "${cert}"`)
             .then(() => false)
             .catch(({ stdout }) => stdout.trim() === 'Certificate will expire');
-    }
-    static async provide(commonName) {
+    },
+    async provide(commonName) {
         if (typeof commonName !== 'string') {
             throw Error(
                 debug.errorMsg(
@@ -22,18 +24,18 @@ module.exports = class SSLCertStore {
                 )
             );
         }
-        let certPair = await this.userCerts.get(commonName);
+        let certPair = await userCerts.get(commonName);
         if (certPair && (await this.expired(certPair.cert))) {
             certPair = null;
-            await this.userCerts.del(commonName);
+            await userCerts.del(commonName);
         }
         if (!certPair) {
             certPair = await this.create(commonName);
-            await this.userCerts.set(commonName, certPair);
+            await userCerts.set(commonName, certPair);
         }
         return certPair;
-    }
-    static async create(commonName) {
+    },
+    async create(commonName) {
         try {
             return JSON.parse(
                 await runAsRoot(

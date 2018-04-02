@@ -7,35 +7,36 @@ class ServiceWorkerPlugin {
     static validateOptions = optionsValidator('ServiceWorkerPlugin', {
         'env.mode': 'string',
         serviceWorkerFileName: 'string',
-        'paths.assets': 'string',
-        runtimeCacheAssetPath: 'string'
+        'paths.assets': 'string'
     });
     constructor(config) {
         ServiceWorkerPlugin.validateOptions('ServiceWorkerPlugin', config);
         this.config = config;
     }
     applyWorkbox(compiler) {
-        new WorkboxPlugin.GenerateSW({
+        const config = {
             // `globDirectory` and `globPatterns` must match at least 1 file
             // otherwise workbox throws an error
             globDirectory: this.config.paths.assets,
             // TODO: (feature) autogenerate glob patterns from asset manifest
             globPatterns: ['**/*.{gif,jpg,png,svg}'],
 
-            // specify external resources to be cached
-            runtimeCaching: [
-                {
-                    urlPattern: new RegExp(this.config.runtimeCacheAssetPath),
-                    handler: 'staleWhileRevalidate'
-                }
-            ],
-
             // activate the worker as soon as it reaches the waiting phase
             skipWaiting: true,
 
             // the max scope of a worker is its location
             swDest: this.config.serviceWorkerFileName
-        }).apply(compiler);
+        };
+
+        if (this.config.runtimeCacheAssetPath) {
+            config.runtimeCaching = [
+                {
+                    urlPattern: new RegExp(this.config.runtimeCacheAssetPath),
+                    handler: 'staleWhileRevalidate'
+                }
+            ];
+        }
+        new WorkboxPlugin.GenerateSW(config).apply(compiler);
     }
     apply(compiler) {
         if (this.config.env.mode === 'development') {

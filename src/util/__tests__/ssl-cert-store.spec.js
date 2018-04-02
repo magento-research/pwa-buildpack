@@ -19,6 +19,7 @@ beforeAll(() => {
     }));
     SSLCertStore = require('../ssl-cert-store');
 });
+afterAll(() => GlobalConfig.mockRestore());
 
 test('static async expired(cert) uses openssl to test whether a cert has expired or is expiring', async () => {
     exec.mockRejectedValueOnce({
@@ -92,5 +93,3 @@ test('static async create() throws a formatted error if the root call did not wo
         /generating dev cert/
     );
 });
-
-afterAll(() => GlobalConfig.mockRestore());

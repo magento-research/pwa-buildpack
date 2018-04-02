@@ -17,7 +17,8 @@
     "prettier:check": "prettier-check 'src/**/*.js'"
   },
   "files": [
-    "dist"
+    "dist",
+    "buildpack-logo.icns"
   ],
   "engines": {
     "node": ">=8.0.0"
@@ -70,8 +71,6 @@
     "ajv": "^6.1.1",
     "debug": "^3.1.0",
     "express": "^4.16.2",
-    "babel-helper-module-imports": "^7.0.0-beta.3",
-    "faded-progressbar": "^0.9.3",
     "flat-file-db": "^1.0.0",
     "harmon": "^1.3.2",
     "hostile": "^1.3.1",

@@ -20,14 +20,6 @@ test('throws if options are missing', () => {
                 serviceWorkerFileName: 'file.name'
             })
     ).toThrow('paths.assets must be of type string');
-    expect(
-        () =>
-            new ServiceWorkerPlugin({
-                env: { mode: 'development' },
-                serviceWorkerFileName: 'file.name',
-                paths: { assets: 'hey' }
-            })
-    ).toThrow('runtimeCacheAssetPath must be of type string');
 });
 
 test('returns a valid Webpack plugin', () => {

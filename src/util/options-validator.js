@@ -1,5 +1,5 @@
 const lget = require('lodash.get');
-const NOPE = {};
+const BLANK_DEFAULT = {};
 
 class BuildpackValidationError extends Error {
     constructor(name, callsite, validationErrors) {
@@ -25,8 +25,8 @@ class BuildpackValidationError extends Error {
 module.exports = (name, simpleSchema) => (callsite, options) => {
     const invalid = Object.entries(simpleSchema).reduce(
         (out, [key, requiredType]) => {
-            const opt = lget(options, key, NOPE);
-            if (opt === NOPE || typeof opt !== requiredType) {
+            const opt = lget(options, key, BLANK_DEFAULT);
+            if (opt === BLANK_DEFAULT || typeof opt !== requiredType) {
                 out.push([key, requiredType]);
             }
             return out;

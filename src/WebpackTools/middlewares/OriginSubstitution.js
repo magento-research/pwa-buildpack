@@ -1,4 +1,13 @@
-const debug = require('../../util/debug').here(__filename);
+/**
+ * Replace all instances of one URL base in an HTML response, with another.
+ * Useful for proxying to systems like Magento, which often generate absolute
+ * URLs in their render output.
+ *
+ * Rather than configure Magento to use the your temporary dev server URL as
+ * its configured base domain, this middleware allows the dev server to text
+ * replace any links, resources, or reference URLs on the fly.
+ */
+const debug = require('../../util/debug').makeFileLogger(__filename);
 const url = require('url');
 const harmon = require('harmon');
 const through = require('through');

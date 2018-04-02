@@ -1,4 +1,4 @@
-const debug = require('./debug').here(__filename);
+const debug = require('./debug').makeFileLogger(__filename);
 const { resolve } = require('path');
 const { homedir } = require('os');
 const { createHash } = require('crypto');
@@ -10,18 +10,19 @@ class GlobalConfig {
     }
     static async db() {
         if (!this._dbPromise) {
-            this._dbPromise = new Promise((joy, pain) => {
+            this._dbPromise = new Promise((resolve, reject) => {
                 try {
                     const dbFilePath = this.getDbFilePath();
                     debug(`no cached db exists, pulling db from ${dbFilePath}`);
                     const db = flatfile(dbFilePath);
                     debug(`db created, waiting for open event`, db);
+                    db.on('error', reject);
                     db.on('open', () => {
                         debug('db open, fulfilling to subscribers');
-                        joy(db);
+                        resolve(db);
                     });
                 } catch (e) {
-                    pain(e);
+                    reject(e);
                 }
             });
         }
@@ -41,6 +42,14 @@ class GlobalConfig {
             );
         }
 
+        if (key.length === 0) {
+            throw Error(
+                debug.errorMsg(
+                    'Provided `key` function must take at least on argument.'
+                )
+            );
+        }
+
         if (typeof prefix !== 'string') {
             throw Error(
                 debug.errorMsg('Must provide a `prefix` string in options.')
@@ -57,10 +66,6 @@ class GlobalConfig {
                     this._prefix
                 } key`
             );
-        }
-        if (keyparts.length === 0) {
-            // a scalar, then
-            return this._prefix;
         }
         const hash = createHash('md5');
         const key = this._makeKey(...keyparts);
@@ -86,25 +91,28 @@ class GlobalConfig {
         const db = await this.constructor.db();
         const key = this.makeKey(args.slice(0, -1));
         debug(`${this._prefix} set()`, args, `made key: ${key}`);
-        return new Promise((yay, boo) =>
+        return new Promise((resolve, reject) =>
             db.put(
                 key,
                 args.slice(-1)[0],
-                (err, res) => (err ? boo(err) : yay(res))
+                (error, response) => (error ? reject(error) : resolve(response))
             )
         );
     }
     async del(...keyparts) {
         const db = await this.constructor.db();
         const key = this.makeKey(keyparts);
-        return new Promise((wow, ow) =>
-            db.del(key, (err, res) => (err ? ow(err) : wow(res)))
+        return new Promise((resolve, reject) =>
+            db.del(
+                key,
+                (error, response) => (error ? reject(error) : resolve(response))
+            )
         );
     }
     async values(xform = x => x) {
         const db = await this.constructor.db();
         return db.keys().reduce((out, k) => {
-            if (k.indexOf(this._prefix) === 0) {
+            if (k.startsWith(this._prefix)) {
                 out.push(xform(db.get(k)));
             }
             return out;
@@ -112,8 +120,8 @@ class GlobalConfig {
     }
     async clear() {
         const db = await this.constructor.db();
-        return new Promise((cool, fool) =>
-            db.clear(e => (e ? fool(e) : cool()))
+        return new Promise((resolve, reject) =>
+            db.clear(error => (error ? reject(error) : resolve()))
         );
     }
 }

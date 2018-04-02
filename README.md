@@ -17,13 +17,15 @@ Build and development tools for Magento Progressive Web Apps
 Magento Progressive Web Apps are built on top of Magento Themes. Start your PWA
 by going through the familiar process of [creating a new theme][1].
 
+[1]: <http://devdocs.magento.com/guides/v2.2/frontend-dev-guide/themes/theme-create.html>
+
 Existing themes use a centrally managed asset build system in `dev/tools/grunt`,
 with a `package.json.sample` at application root as a starting point. **PWA
 Studio themes have their own `package.json` instead, at the theme root folder.
 This file configures NPM to manage JavaScript dependencies, configuration,
 and build tools; it's **`composer.json` for JavaScript.**
 
-### II. Create Package Configuration
+### II. Create Package Configuration and Structure
 
 1. If you have NodeJS LTS installed, you should have access to `npm` at the
    command line. In your theme directory, run:
@@ -40,40 +42,67 @@ and build tools; it's **`composer.json` for JavaScript.**
    as a production dependency:
 
    ```sh
-   npm install --save @magento/peregrine
+   npm install --save @magento/peregrine react react-dom react-redux react-router-dom redux
    ```
 
-1. Install Webpack Webpack Dev Server, and Buildpack as developer dependencies.
+You should now see those dependencies and their versions listed in the
+`dependencies` section of `package.json`.
 
-   ```sh
-   npm install --save-dev webpack webpack-dev-server @magento/pwa-buildpack
+### III: Create a Simple Peregrine App
+
+Create an app that follows the Peregrine pattern (more notes forthcoming).
+
+1. Create a directory in your theme root called `src`.
+
+1. Inside `src`, create a directory called `components`, and a file in
+   `src/components` called `app.js`. Put this code in `src/components/app.js`:
+
+   ```js
+   import React from 'react';
+
+   export default class App extends React.Component {
+       render() {
+           return (
+               <h1>
+                   Hello, Studio!
+               </h1>
+           );
+       }
+   }
    ```
 
-1. Now, edit your new `package.json` file. You should see your `dependencies`
-   and `devDependencies`. You should also see a `scripts` section that looks
-   something like this:
+1. Inside `src`, create a file called `index.js`. Put the following code in
+   `src/index.js`:
 
-   ```diff
-     "scripts": {
-       "test": "echo \"Error: no test specified\" && exit 1"
-     }
+   ```js
+   import Peregrine from '@magento/peregrine';
+   import App from './components/app';
+
+   const app = new Peregrine();
+   const container = document.getElementById('root');
+
+   app.component = App;
+   app.mount(container);
+
+   if ('serviceWorker' in navigator) {
+       window.addEventListener('load', () => {
+           navigator.serviceWorker
+               .register(process.env.SERVICE_WORKER_FILE_NAME);
+       });
+   }
+
+   export default app;
    ```
 
-   Add a line to the `scripts` section:
+1. Inside `src`, create a directory called `RootComponents`. Leave
+   `src/RootComponents` empty for now.
 
-   ```diff
-     "scripts": {
-   +   "start": "webpack-dev-server --progress --color --env development",
-       "test": "echo \"Error: no test specified\" && exit 1"
-     }
-   ```
+You have created a Peregrine app skeleton!
 
-   This enables you to start a development server just by running `npm start`.
+### IV. Configure Local Development Setup
 
-### III. Configure Local Development Setup
-
-Configure your developer tools to work with your local Magento 2 instance *(or
-a remote Magento 2 instance, if your development setup uses one). Some of this
+Configure your theme to run on your local Magento 2 instance *(or a remote
+Magento 2 instance, if your development setup uses one). Some of this
 configuration is unique to your individual environment and should not be
 included in the theme source code or build specifications. For these config
 values, use environment variables.
@@ -86,7 +115,7 @@ which reads an ini-formatted file to set the environment.
  1. Install the `dotenv` tool as a developer dependency:
 
     ```sh
-    npm install dotenv
+    npm install --save-dev dotenv
     ```
 
  1. Create a file in your theme directory called `.env`. Put the following lines
@@ -107,13 +136,43 @@ which reads an ini-formatted file to set the environment.
     SERVICE_WORKER_FILE_NAME="sw.js"
     ```
 
-### IV. Install Developer Tools
+### V. Install and Configure Developer Tools
+
+1. Install Buildpack and its standard peer dependencies.
+
+   ```sh
+   npm install --save-dev @magento/pwa-buildpack \
+   babel-core babel-loader babel-helper-module-imports \
+   babel-plugin-syntax-jsx babel-plugin-transform-class-properties \
+   babel-plugin-transform-object-rest-spread babel-plugin-transform-react-jsx \
+   webpack webpack-cli webpack-dev-server
+   ```
+
+1. Create a file in your theme directory called `.babelrc`. Babel, the code
+   transpilation tool, will use this file as configuration when Webpack runs
+   `babel-loader`.
+
+   Put the following in `.babelrc`:
+
+   ```json
+   {
+       "plugins": [
+           "syntax-jsx",
+           "transform-class-properties",
+           "transform-object-rest-spread",
+           "transform-react-jsx"
+       ]
+   }
+   ```
+
+    This is a minimal Babel configuration for fast builds, supporting the
+    features you will need for development.
 
 1. Create a file in your theme directory called `webpack.config.js`. Webpack
    will run this file as a Node script, expecting it to export an object that
    tells Webpack how to build your theme.
 
-1. In the first line of your `webpack.config.js` file, add this:
+   In the first line of your `webpack.config.js` file, add this:
 
    ```js
    require('dotenv').config();
@@ -170,17 +229,16 @@ which reads an ini-formatted file to set the environment.
    };
    ```
 
-   This function will execute when Webpack runs and requests configuration. It
-   receives a string argument `env`. The `npm start` script you just added to
-   `package.json` provides that value:
-   `webpack-dev-server --progress --color --env development` sets the `env`
-   argument of your exported function to `development`.
+   This function will execute when Webpack runs and requests configuration.
 
 1. Define the core object you will export as config. You'll modify it later.
+   Insert this definition of `config` into the async function you declared
+   above.
 
    ```js
    module.exports = async function(env) {
        const config = {
+           mode: env.mode, // passed on the command line via the '--env' flag
            context: __dirname, // Node global for the running script's directory
            entry: {
                client: path.resolve(themePaths.src, 'index.js')
@@ -226,7 +284,7 @@ which reads an ini-formatted file to set the environment.
                 new MagentoRootComponentsPlugin(),
                 new webpack.NoEmitOnErrorsPlugin(),
                 new webpack.EnvironmentPlugin({
-                    NODE_ENV: env,
+                    NODE_ENV: env.mode,
                     SERVICE_WORKER_FILE_NAME: 'sw.js'
                 })
             ]
@@ -244,7 +302,7 @@ which reads an ini-formatted file to set the environment.
 1. Create a `PWADevServer` config and attach it to the configuration.
 
    ```js
-   if (env === "development") {
+   if (env.mode === "development") {
        config.devServer = await PWADevServer.configure({
            publicPath: process.env.MAGENTO_BACKEND_PUBLIC_PATH,
            backendDomain: process.env.MAGENTO_BACKEND_DOMAIN,
@@ -257,44 +315,71 @@ which reads an ini-formatted file to set the environment.
        // to assign the main outputPath to this value as well.
 
        config.output.publicPath = config.devServer.publicPath;
-   }
    ```
 
 1. Create a `ServiceWorkerPlugin` and attach it to the configuration.
 
    ```js
-   config.plugins.push(
-       new ServiceWorkerPlugin({
-           env: { mode: env },
-           paths: themePaths,
-           enableServiceWorkerDebugging: false,
-           serviceWorkerFileName process.env.SERVICE_WORKER_FILE_NAME
-       })
-   );
+        config.plugins.push(
+            new ServiceWorkerPlugin({
+                env,
+                paths: themePaths,
+                enableServiceWorkerDebugging: false,
+                serviceWorkerFileName: process.env.SERVICE_WORKER_FILE_NAME
+            })
+        );
    ```
 
 1. Finally, add a `webpack.HotModuleReplacementPlugin` to enable fast workflow.
 
    ```js
-   config.plugins.push(
-       new webpack.HotModuleReplacementPlugin()
-   )
+        config.plugins.push(
+            new webpack.HotModuleReplacementPlugin()
+        );
    ```
 
-1. Add a note to configure the production side at a later time.
+1. Close the `if (env.mode === "development"` bluc. Add a note to configure the
+   production side at a later time.
 
     ```js
-    if (env === "production") {
-        throw Error("Production configuration not implemented yet.");
-    }
+        } else if (env.mode === "production") {
+            throw Error("Production configuration not implemented yet.");
+        }
     ```
 
-You now have a functioning, organized, and efficient `package.json`.
+1. Lastly, return the configuration object from your configurator function in
+   order to pass it back to Webpack.
 
-### V: Author a Simple Peregrine App
+   ```js
+     return config;
+   }
+   ```
 
-Create an app that follows the Peregrine pattern (more notes forthcoming). It
-should use the same structure that the Webpack config expects.
+    You now have a simple and orderly `webpack.config.js` using Buildpack!
+
+1. Now, edit your `package.json` file. You should see your `dependencies`
+   and `devDependencies`. You should also see a `scripts` section that looks
+   something like this:
+
+   ```diff
+     "scripts": {
+       "test": "echo \"Error: no test specified\" && exit 1"
+     }
+   ```
+
+   Add a line to the `scripts` section:
+
+   ```diff
+     "scripts": {
+   +   "start": "webpack-dev-server --progress --color --env.mode development",
+       "test": "echo \"Error: no test specified\" && exit 1"
+     }
+   ```
+
+   This enables you to start a development server just by running `npm start`.
+   The `--env.mode development` argument affects the argument Webpack sends
+   to the configuration function exported from `webpack.config.js`. The function
+   will receive an object with its `mode` property set to `"development"`.
 
 ### VI. Run Development Cycle
 
@@ -303,7 +388,7 @@ start`. A Magento PWA theme is no different! Start the development cycle with
 `npm start` in your theme directory.
 
 ```sh
-theme/ $ npm start
+npm start
 ```
 
 ⚠️ *The first time you run `npm start`, or if you haven't run `npm start` in a
@@ -317,7 +402,8 @@ Magento PWAs are based on a general-purpose PWA development framework,
 [Peregrine](https://github.com/magento-research/peregrine). These tools connect
 a Peregrine app to a Magento backend and a
 [Webpack](https://webpack.js.org)-based build environment. The mission of
-`pwa-buildpack` is to be the zero-configuration, easy-setup development and deployment tools for Magento-supported Progressive Web Apps.
+`pwa-buildpack` is to be the zero-configuration, easy-setup development and
+deployment tools for Magento-supported Progressive Web Apps.
 
 ### Developing Magento Storefronts
 
@@ -343,7 +429,8 @@ or energy setting up their own services layer.
 - [`MagentoRootComponentsPlugin`](docs/MagentoRootComponentsPlugin.md) --
   Divides static assets into bundled "chunks" based on components registered
   with the Magento PWA `RootComponent` interface
-- [`PWADevServer`](docs/PWADevServer.md) -- Configures your system settings and
+- [`PWADevServer`](docs/PWADevServer.md) -- Autoconfigures local system and
+  theme configuration for local PWA-optimized theme development
 - [`ServiceWorkerPlugin`](docs/ServiceWorkerPlugin.md) -- Creates
   a ServiceWorker with different settings based on dev scenarios
 - [`MagentoResolver`](docs/MagentoResolver.md) -- Configures Webpack to resolve
@@ -357,5 +444,3 @@ dev environment automatically. `pwa-buildpack` is a peer, not a replacement, for
 those tools. This project is an element of Magento PWA Studio, and it will
 always track the best practices of frontend development and PWA development
 particularly. There is room for other tools serving other use cases.
-
-1: <http://devdocs.magento.com/guides/v2.2/frontend-dev-guide/themes/theme-create.html>
