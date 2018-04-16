@@ -1,6 +1,6 @@
 const magentoLayoutLoader = require('./magento-layout-loader');
 
 module.exports = {
-    babelPluginMagentoLayout,
+    magentoLayoutLoader,
     WebpackTools: require('./WebpackTools')
 };
