@@ -12,7 +12,7 @@
     "test:debug:focus": "node --inspect-brk ./node_modules/.bin/jest --runInBand --no-coverage --no-cache \"${FOCUS}.*\"",
     "build": "babel src --out-dir dist --ignore '__tests__/,__mocks__/,__fixtures__/' --source-maps --copy-files",
     "lint": "eslint '*.js' 'src/**/*.js'",
-    "jest:ci": "jest --forceExit --testResultsProcessor=./node_modules/jest-junit-reporter",
+    "jest:ci": "jest -i --testResultsProcessor=./node_modules/jest-junit-reporter",
     "prettier": "prettier --write 'src/**/*.js'",
     "prettier:check": "prettier-check 'src/**/*.js'"
   },
