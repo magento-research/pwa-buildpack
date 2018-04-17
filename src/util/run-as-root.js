@@ -83,11 +83,9 @@ module.exports = async (fn, ...args) => {
         const stdout = sudoPromptToRunShell(
             `${process.argv[0]} ${scriptLoc} && rm ${scriptLoc}`
         );
-        await unlink(scriptLoc);
         return stdout;
-    } catch (e) {
+    } finally {
         await unlink(scriptLoc);
-        throw e;
     }
     // do a finally
 };

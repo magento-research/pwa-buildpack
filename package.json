@@ -6,9 +6,9 @@
   "scripts": {
     "test": "run-p jest:ci prettier:check lint",
     "test:dev": "run-s prettier lint jest:ci",
-    "test:watch": "jest --watch --runInBand",
+    "test:watch": "jest --watch",
     "test:debug": "node --inspect-brk ./node_modules/.bin/jest --runInBand",
-    "test:watch:focus": "jest --watch --runInBand --coverageReporters=text --collectCoverageFrom=\"${FOCUS}/**/*.js\" --no-cache \"${FOCUS}.*\"",
+    "test:watch:focus": "jest --watch --coverageReporters=text --collectCoverageFrom=\"${FOCUS}/**/*.js\" --no-cache \"${FOCUS}.*\"",
     "test:debug:focus": "node --inspect-brk ./node_modules/.bin/jest --runInBand --no-coverage --no-cache \"${FOCUS}.*\"",
     "build": "babel src --out-dir dist --ignore '__tests__/,__mocks__/,__fixtures__/' --source-maps --copy-files",
     "lint": "eslint '*.js' 'src/**/*.js'",

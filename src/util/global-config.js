@@ -4,6 +4,8 @@ const { homedir } = require('os');
 const { createHash } = require('crypto');
 const flatfile = require('flat-file-db');
 
+const toString = x => x.toString();
+
 class GlobalConfig {
     static getDbFilePath() {
         return resolve(homedir(), './.config/pwa-buildpack.db');
@@ -34,11 +36,11 @@ class GlobalConfig {
             throw Error(debug.errorMsg('Must provide options.'));
         }
 
-        const { key, prefix } = options;
+        const { key = toString, prefix } = options;
 
         if (typeof key !== 'function') {
             throw Error(
-                debug.errorMsg('Must provide a `key` function in options.')
+                debug.errorMsg('`key` function in options must be a function.')
             );
         }
 

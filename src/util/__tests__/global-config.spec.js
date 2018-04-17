@@ -75,7 +75,6 @@ test('static async db() rejects with underlying error if db create failed', asyn
 
 test('GlobalConfig constructor throws if no conf or missing required conf', () => {
     expect(() => new GlobalConfig()).toThrow();
-    expect(() => new GlobalConfig({ prefix: 'foo' })).toThrow();
     expect(() => new GlobalConfig({ key: x => x })).toThrow();
     expect(
         () => new GlobalConfig({ key: 'bad key', prefix: 'good prefix' })
@@ -83,6 +82,7 @@ test('GlobalConfig constructor throws if no conf or missing required conf', () =
     expect(
         () => new GlobalConfig({ key: () => {}, prefix: 'good prefix' })
     ).toThrow();
+    expect(() => new GlobalConfig({ prefix: 'good prefix' })).not.toThrow();
     expect(
         () => new GlobalConfig({ key: x => x, prefix: 'good prefix' })
     ).not.toThrow();
@@ -94,7 +94,7 @@ test('.get() throws with wrong key arity', async () => {
 });
 
 test('.get() calls underlying flatfile', async () => {
-    const cfg = new GlobalConfig({ prefix: 'test1', key: x => x });
+    const cfg = new GlobalConfig({ prefix: 'test1' });
     await cfg.get('value');
     expect(crypto.createHash).toHaveBeenCalled();
     expect(mockHash.update).toHaveBeenCalledWith('value');
