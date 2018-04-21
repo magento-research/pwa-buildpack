@@ -8,7 +8,7 @@ scenarios.
 This plugin is a wrapper around the [Google Workbox Webpack Plugin](https://developers.google.com/web/tools/workbox/guides/generate-service-worker/).
 It generates a caching ServiceWorker based on assets emitted by Webpack.
 
-This plugin can be configured to run in the following modes:
+This plugin can be configured to run in the following phases:
 
 - *normal development* - ServiceWorker is disabled
 - *service worker debugging* - ServiceWorker and hot-reloading are enabled
@@ -57,7 +57,7 @@ Plugin constructor for the `ServiceWorkerPlugin` class.
 
 `env: Object` **(Required)**
  An object that represents the current environment.
-- `env.mode: String` **(Required)**
+- `env.phase: String` **(Required)**
     Must be either `'development'` or `'production'`.
 
 `paths: Object` **(Required)**

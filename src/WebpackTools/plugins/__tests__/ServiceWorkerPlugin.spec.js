@@ -8,15 +8,15 @@ const ServiceWorkerPlugin = require('../ServiceWorkerPlugin');
 
 test('throws if options are missing', () => {
     expect(() => new ServiceWorkerPlugin({})).toThrow(
-        'env.mode must be of type string'
+        'env.phase must be of type string'
     );
     expect(
-        () => new ServiceWorkerPlugin({ env: { mode: 'development' } })
+        () => new ServiceWorkerPlugin({ env: { phase: 'development' } })
     ).toThrow('serviceWorkerFileName must be of type string');
     expect(
         () =>
             new ServiceWorkerPlugin({
-                env: { mode: 'development' },
+                env: { phase: 'development' },
                 serviceWorkerFileName: 'file.name'
             })
     ).toThrow('paths.assets must be of type string');
@@ -26,7 +26,7 @@ test('returns a valid Webpack plugin', () => {
     expect(
         new ServiceWorkerPlugin({
             env: {
-                mode: 'development'
+                phase: 'development'
             },
             serviceWorkerFileName: 'sw.js',
             runtimeCacheAssetPath: 'https://location/of/assets',
@@ -40,7 +40,7 @@ test('returns a valid Webpack plugin', () => {
 test('.apply calls WorkboxPlugin.GenerateSW in prod', () => {
     const plugin = new ServiceWorkerPlugin({
         env: {
-            mode: 'production'
+            phase: 'production'
         },
         serviceWorkerFileName: 'sw.js',
         runtimeCacheAssetPath: 'https://location/of/assets',
@@ -70,7 +70,7 @@ test('.apply calls WorkboxPlugin.GenerateSW in prod', () => {
 test('.apply calls nothing but warns in console in dev', () => {
     const plugin = new ServiceWorkerPlugin({
         env: {
-            mode: 'development'
+            phase: 'development'
         },
         serviceWorkerFileName: 'sw.js',
         runtimeCacheAssetPath: 'https://location/of/assets',
@@ -87,7 +87,7 @@ test('.apply calls nothing but warns in console in dev', () => {
 
     expect(console.warn).toHaveBeenCalledWith(
         expect.stringContaining(
-            `Emitting no ServiceWorker in development mode.`
+            `Emitting no ServiceWorker in development phase.`
         )
     );
 
@@ -97,7 +97,7 @@ test('.apply calls nothing but warns in console in dev', () => {
 test('.apply generates and writes out a serviceworker when enableServiceWorkerDebugging is set', () => {
     const plugin = new ServiceWorkerPlugin({
         env: {
-            mode: 'development'
+            phase: 'development'
         },
         enableServiceWorkerDebugging: true,
         serviceWorkerFileName: 'sw.js',
