@@ -161,7 +161,7 @@ const PWADevServer = {
                 // set static server to load and serve from different paths
                 app.use(config.publicPath, express.static(config.paths.assets));
 
-                if (typeof config.middleware === "function") {
+                if (typeof config.middleware === 'function') {
                     config.middleware(app);
                 }
             }
