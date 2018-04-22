@@ -138,6 +138,28 @@ test('.findFreeHostname() skips past taken hostnames for an identifier', async (
     expect(hostname2).toBe('foo3.local.pwadev');
 });
 
+test('.findFreeHostname() bails after 9 failed attempts', async () => {
+    const hostname = await PWADevServer.findFreeHostname('foo');
+    expect(hostname).toBe('foo.local.pwadev');
+
+    simulate
+        .portSavedForNextHostname()
+        .portSavedForNextHostname()
+        .portSavedForNextHostname()
+        .portSavedForNextHostname()
+        .portSavedForNextHostname()
+        .portSavedForNextHostname()
+        .portSavedForNextHostname()
+        .portSavedForNextHostname()
+        .portSavedForNextHostname()
+        .portSavedForNextHostname()
+        .portSavedForNextHostname();
+
+    await expect(PWADevServer.findFreeHostname('foo')).rejects.toThrowError(
+        `Unable to find a free hostname after`
+    );
+});
+
 test('.provideDevHost() returns a URL object with a free dev host origin', async () => {
     simulate
         .noHostnameForNextId()

@@ -86,6 +86,13 @@ const PWADevServer = {
             return maybeHostname;
         } else {
             debug(`findFreeHostname: ${maybeHostname} bound to port`, exists);
+            if (times > 9) {
+                throw Error(
+                    debug.errorMsg(
+                        `findFreeHostname: Unable to find a free hostname after 9 tries. You may want to delete your database file at ${GlobalConfig.getDbFilePath()} to clear out old developer hostname entries. (Soon we will make this easier and more automatic.)`
+                    )
+                );
+            }
             return PWADevServer.findFreeHostname(identifier, times + 1);
         }
     },
