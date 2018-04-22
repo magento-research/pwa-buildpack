@@ -20,11 +20,8 @@ const middlewares = {
 
 let PWADevServer;
 beforeAll(() => {
-    GlobalConfig.mockImplementation(({ key }) => ({
-        set: jest.fn((...args) => {
-            const keyParts = args.slice(0, -1);
-            expect(typeof key(...keyParts)).toBe('string');
-        }),
+    GlobalConfig.mockImplementation(() => ({
+        set: jest.fn(),
         get: jest.fn(),
         values: jest.fn()
     }));
