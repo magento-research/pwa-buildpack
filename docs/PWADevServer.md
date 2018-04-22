@@ -93,3 +93,6 @@ configuration.
   - `assets`: Directory for other public static assets.
 - `serviceWorkerFileName: string`: **Required.** The name of the ServiceWorker
    file this theme creates, e.g. `'sw.js'`.
+- `middleware: function`: A function which receives the Express `app` as its
+   argument. Runs before the app is configured otherwise (in the `before` step),
+   so you can use this to add custom middleware.
