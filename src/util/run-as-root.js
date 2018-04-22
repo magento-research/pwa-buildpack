@@ -87,5 +87,4 @@ module.exports = async (fn, ...args) => {
     } finally {
         await unlink(scriptLoc);
     }
-    // do a finally
 };
