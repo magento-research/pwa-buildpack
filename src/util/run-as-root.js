@@ -28,10 +28,13 @@ const sudoPromptToRunShell = async cmd =>
         sudoPrompt.exec(cmd, opts, (error, stdout, stderr) => {
             debug(`sudo ${cmd} returned`, { error, stdout, stderr });
             if (error) {
-                error.message = [error.message, stderr, stdout]
-                    .filter(x => !!x)
-                    .join('\n\n');
-                return reject(error);
+                return reject(
+                    new Error(
+                        [error.message || error, stderr, stdout]
+                            .filter(x => !!x)
+                            .join('\n\n')
+                    )
+                );
             }
             return resolve(stdout);
         });
@@ -80,10 +83,7 @@ module.exports = async (fn, ...args) => {
     await writeFile(scriptLoc, invoked, 'utf8');
     debug(`elevating privileges for ${impl}`);
     try {
-        const stdout = sudoPromptToRunShell(
-            `${process.argv[0]} ${scriptLoc} && rm ${scriptLoc}`
-        );
-        return stdout;
+        return await sudoPromptToRunShell(`${process.argv[0]} ${scriptLoc}`);
     } finally {
         await unlink(scriptLoc);
     }
