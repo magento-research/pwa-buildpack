@@ -5,7 +5,7 @@
 
 const debug = require('./debug').makeFileLogger(__filename);
 const path = require('path');
-const { writeFile, unlink } = require('./promisified/fs');
+const fs = require('./promisified/fs');
 const sudoPrompt = require('sudo-prompt');
 const { join } = require('path');
 const tmp = () =>
@@ -28,13 +28,18 @@ const sudoPromptToRunShell = async cmd =>
         sudoPrompt.exec(cmd, opts, (error, stdout, stderr) => {
             debug(`sudo ${cmd} returned`, { error, stdout, stderr });
             if (error) {
-                return reject(
-                    new Error(
-                        [error.message || error, stderr, stdout]
-                            .filter(x => !!x)
-                            .join('\n\n')
-                    )
-                );
+                const isTruthy = x => x;
+                // the below trick displays all non-empty values
+                // without a bunch of extra newlines
+                const fullOutputForError = [
+                    error.message || error,
+                    stderr,
+                    stdout
+                ]
+                    .filter(isTruthy)
+                    .join('\n\n');
+
+                return reject(new Error(fullOutputForError));
             }
             return resolve(stdout);
         });
@@ -80,11 +85,11 @@ module.exports = async (fn, ...args) => {
     const impl = fn.toString();
     const scriptLoc = tmp();
     const invoked = `(${impl})(...${JSON.stringify(args)})`;
-    await writeFile(scriptLoc, invoked, 'utf8');
+    await fs.writeFile(scriptLoc, invoked, 'utf8');
     debug(`elevating privileges for ${impl}`);
     try {
         return await sudoPromptToRunShell(`${process.argv[0]} ${scriptLoc}`);
     } finally {
-        await unlink(scriptLoc);
+        await fs.unlink(scriptLoc);
     }
 };
