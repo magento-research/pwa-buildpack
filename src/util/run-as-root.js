@@ -28,15 +28,15 @@ const sudoPromptToRunShell = async cmd =>
         sudoPrompt.exec(cmd, opts, (error, stdout, stderr) => {
             debug(`sudo ${cmd} returned`, { error, stdout, stderr });
             if (error) {
-                const isTruthy = x => x;
                 // the below trick displays all non-empty values
                 // without a bunch of extra newlines
+                const identity = x => x;
                 const fullOutputForError = [
                     error.message || error,
                     stderr,
                     stdout
                 ]
-                    .filter(isTruthy)
+                    .filter(identity)
                     .join('\n\n');
 
                 return reject(new Error(fullOutputForError));
