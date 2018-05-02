@@ -12,26 +12,30 @@ const RedirectCodes = [201, 301, 302, 307, 308];
 const findRedirect = message =>
     RedirectCodes.includes(message.statusCode) && message.headers.location;
 
-const detectProtocolChange = (target, redirected) => {
+const throwOnProtocolChange = (target, redirected) => {
     const backend = new URL(target);
     const { host, protocol } = new URL(redirected);
-    if (backend.host === host && backend.protocol !== protocol) {
-        if (backend.protocol === 'https:' && protocol === 'http:') {
-            throw Error(
-                `pwa-buildpack: Backend domain is configured to ${target}, but redirected to unsecure HTTP. Please configure backend server to use SSL.`
-            );
-        } else if (backend.protocol === 'http:' && protocol === 'https:') {
-            throw Error(
-                `pwa-buildpack: Backend domain is configured to ${target}, but redirected to secure HTTPS. Please change configuration to point to secure backend domain: ${format(
-                    Object.assign(backend, { protocol: 'https:' })
-                )}.`
-            );
-        } else {
-            throw Error(
-                `pwa-buildpack: Backend domain redirected to unknown protocol: ${redirected}`
-            );
-        }
+    if (backend.host === host && backend.protocol === protocol) {
+        return;
     }
+
+    if (backend.protocol === 'https:' && protocol === 'http:') {
+        throw Error(
+            `pwa-buildpack: Backend domain is configured to ${target}, but redirected to unsecure HTTP. Please configure backend server to use SSL.`
+        );
+    }
+
+    if (backend.protocol === 'http:' && protocol === 'https:') {
+        throw Error(
+            `pwa-buildpack: Backend domain is configured to ${target}, but redirected to secure HTTPS. Please change configuration to point to secure backend domain: ${format(
+                Object.assign(backend, { protocol: 'https:' })
+            )}.`
+        );
+    }
+
+    throw Error(
+        `pwa-buildpack: Backend domain redirected to unknown protocol: ${redirected}`
+    );
 };
 
 module.exports = function createDevProxy(
@@ -44,7 +48,7 @@ module.exports = function createDevProxy(
         onProxyRes(proxyRes) {
             const redirected = findRedirect(proxyRes);
             if (redirected) {
-                detectProtocolChange(target, redirected);
+                throwOnProtocolChange(target, redirected);
             }
         },
         target,
