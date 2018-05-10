@@ -13,6 +13,11 @@ beforeAll(() => {
         logger[method] = jest.fn();
         jest.spyOn(console, method).mockImplementation();
     });
+    // We wait to require DevProxy here because DevProxy imports `http-proxy-middleware`, and
+    // `http-proxy-middleware` creates a "default logger" at module definition time--that is, when
+    // we require() it. The default logger destructures the console object, so it no longer holds
+    // a reference to `console` itself. This makes us unable to mock `console` for the
+    // `http-proxy-middleware` library if it loads before the mock does.
     devProxy = require('../DevProxy');
 });
 
