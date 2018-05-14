@@ -238,7 +238,6 @@ which reads an ini-formatted file to set the environment.
    ```js
    module.exports = async function(env) {
        const config = {
-           mode: env.mode, // passed on the command line via the '--env' flag
            context: __dirname, // Node global for the running script's directory
            entry: {
                client: path.resolve(themePaths.src, 'index.js')
@@ -284,7 +283,7 @@ which reads an ini-formatted file to set the environment.
                 new MagentoRootComponentsPlugin(),
                 new webpack.NoEmitOnErrorsPlugin(),
                 new webpack.EnvironmentPlugin({
-                    NODE_ENV: env.mode,
+                    NODE_ENV: env.phase,
                     SERVICE_WORKER_FILE_NAME: 'sw.js'
                 })
             ]
@@ -297,12 +296,12 @@ which reads an ini-formatted file to set the environment.
    environment variables, the presence of a `MagentoRootComponent` plugin, and
    the way that environment variables are plugging into Webpack configuration.
 
-   Now, make special modifications to that object when in development mode.
+   Now, make special modifications to that object when in development mode/phase.
 
 1. Create a `PWADevServer` config and attach it to the configuration.
 
    ```js
-   if (env.mode === "development") {
+   if (env.phase === "development") {
        config.devServer = await PWADevServer.configure({
            publicPath: process.env.MAGENTO_BACKEND_PUBLIC_PATH,
            backendDomain: process.env.MAGENTO_BACKEND_DOMAIN,
@@ -338,11 +337,11 @@ which reads an ini-formatted file to set the environment.
         );
    ```
 
-1. Close the `if (env.mode === "development"` bluc. Add a note to configure the
+1. Close the `if (env.phase === "development"` bluc. Add a note to configure the
    production side at a later time.
 
     ```js
-        } else if (env.mode === "production") {
+        } else if (env.phase === "production") {
             throw Error("Production configuration not implemented yet.");
         }
     ```
@@ -371,15 +370,15 @@ which reads an ini-formatted file to set the environment.
 
    ```diff
      "scripts": {
-   +   "start": "webpack-dev-server --progress --color --env.mode development",
+   +   "start": "webpack-dev-server --progress --color --env.phase development",
        "test": "echo \"Error: no test specified\" && exit 1"
      }
    ```
 
    This enables you to start a development server just by running `npm start`.
-   The `--env.mode development` argument affects the argument Webpack sends
+   The `--env.phase development` argument affects the argument Webpack sends
    to the configuration function exported from `webpack.config.js`. The function
-   will receive an object with its `mode` property set to `"development"`.
+   will receive an object with its `phase` property set to `"development"`.
 
 ### VI. Run Development Cycle
 
