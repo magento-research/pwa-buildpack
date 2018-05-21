@@ -5,15 +5,16 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "run-p jest:ci prettier:check lint",
-    "test:dev": "run-s prettier lint jest:ci",
+    "test:dev": "run-s prettier lint jest:dev",
     "test:watch": "jest --watch",
     "test:debug": "node --inspect-brk ./node_modules/.bin/jest --runInBand",
     "test:watch:focus": "jest --watch --coverageReporters=text --collectCoverageFrom=\"${FOCUS}/**/*.js\" --no-cache \"${FOCUS}.*\"",
     "test:debug:focus": "node --inspect-brk ./node_modules/.bin/jest --runInBand --no-coverage --no-cache \"${FOCUS}.*\"",
     "build": "babel src --out-dir dist --ignore '__tests__/,__mocks__/,__fixtures__/' --source-maps --copy-files",
     "lint": "eslint '*.js' 'src/**/*.js'",
+    "jest:dev": "jest --no-cache --no-coverage",
     "jest:ci": "jest -i --testResultsProcessor=./node_modules/jest-junit-reporter",
-    "prettier": "prettier --write 'src/**/*.js'",
+    "prettier": "prettier --loglevel warn --write 'src/**/*.js'",
     "prettier:check": "prettier-check 'src/**/*.js'",
     "prepublishOnly": "rimraf dist && npm run build"
   },
