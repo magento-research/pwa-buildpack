@@ -84,17 +84,16 @@ test('cleans up temp file on success or failure', async () => {
     );
 });
 
-test('uses a default prompt if called with a non-string as its first argument', async () => {
+test('errors if first arg is not a prompt string', async () => {
     exec.mockImplementationOnce(i => Promise.resolve({ stdout: i }));
-    await runAsRoot(x => x, 5);
-    expect(exec).toHaveBeenCalledWith(
-        expect.stringMatching('sudo -p \\"Temporary administrative')
+    await expect(runAsRoot(x => x, 5)).rejects.toThrowError(
+        'takes a prompt string as its first argument'
     );
 });
 
-test('errors if neither first nor second arg are functions', async () => {
+test('errors if second arg is not a function', async () => {
     exec.mockImplementationOnce(i => Promise.resolve({ stdout: i }));
-    await expect(runAsRoot(3, {}, x => x, 5)).rejects.toThrowError(
-        'takes a function as its first or second argument'
+    await expect(runAsRoot('nothing')).rejects.toThrowError(
+        'takes a function as its second argument'
     );
 });

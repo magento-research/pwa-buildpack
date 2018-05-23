@@ -67,9 +67,8 @@ const sudoPromptToRunShell = async (prompt, cmd) => {
  * able to access any values in enclosed scope. If the function needs a value
  * from the current environment, pass it in through the `args` array and receive
  * it as a parameter.
- *
- * @param {String} prompt Custom prompt to display. Optional, but highly
- *     recommended. [sudo -p](https://www.sudo.ws/man/1.8.17/sudo.man.html#p)
+
+ * @param {String} prompt Prompt message to display. [sudo -p](https://www.sudo.ws/man/1.8.17/sudo.man.html#p)
  *     variables are interpolated from this string.
  * @param {Function} fn JavaScript code to run. Must be a function. It can take
  *     arguments, which must be passed in order in an array to the following
@@ -80,24 +79,18 @@ const sudoPromptToRunShell = async (prompt, cmd) => {
  *     evaluated code. Rejects if the user did not authorize, or if the code
  *     threw an exception.
  */
-module.exports = async (fn, ...args) => {
-    let prompt =
-        'Temporary administrative privileges required. \n Enter password for [%u]: ';
-    let func = fn;
-    if (typeof fn === 'string') {
-        prompt = fn;
-        func = args.shift();
+module.exports = async (prompt, func, ...args) => {
+    if (typeof prompt !== 'string') {
+        throw Error('runAsRoot takes a prompt string as its first argument.');
     }
     if (typeof func !== 'function') {
-        throw Error(
-            'runAsRoot takes a function as its first or second argument.'
-        );
+        throw Error('runAsRoot takes a function as its second argument.');
     }
-    const impl = func.toString();
+    const codeText = func.toString();
     const scriptLoc = tmp();
-    const invoked = `(${impl})(...${JSON.stringify(args)})`;
+    const invoked = `(${codeText})(...${JSON.stringify(args)})`;
     await fs.writeFile(scriptLoc, invoked, 'utf8');
-    debug(`elevating privileges for ${impl}`);
+    debug(`elevating privileges for ${codeText}`);
     try {
         return await sudoPromptToRunShell(
             prompt,
